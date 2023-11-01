@@ -2,7 +2,7 @@ import { Button } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { filterRows, handleEditClick, numberComparator } from '../bookHelper';
+import { filterRows, getBookData, handleEditClick, numberComparator } from '../bookHelper';
 import { allBookList, pagination, setEditedBookData, setPaginationData, userEditBookData, userSearchQuery } from './bookListSlice';
 import './style.css';
 
@@ -14,13 +14,7 @@ const BookList = () => {
   const searchQuery = useSelector(userSearchQuery);
   const paginationData = useSelector(pagination)
   
-  const pageSizeChange=(newPageSize)=>{
-    alert(newPageSize)
-            dispatch(paginationData({
-              ...paginationData,pageSize: newPageSize
-          }))
-  }
-  
+   
 
   const columns = [
     { field: 'author', headerName: 'Author', width: 150, editable: true },
@@ -52,15 +46,21 @@ const BookList = () => {
           pageSize={paginationData.pageSize}
           paginationMode="server"
           initialState={{
-            ...bookData,
+            // ...bookData,
             pagination: { paginationModel: { pageSize: paginationData.pageSize, page: 0 } },
           }}
           // paginationMode="server"
           // onPageSizeChange={(newPageSize) => pageSizeChange(newPageSize)}
-          onPageChange={(newPage) => {
-            // Update the currentPage in the state
-            alert(newPage+1)
-            console.log(paginationData)
+          onPaginationModelChange={(params) => {
+            console.log(params)
+            dispatch(setPaginationData({
+              ...paginationData
+              ,
+              currentPage: params.page+1,
+              pageSize:params.pageSize
+          }))
+          getBookData(searchQuery,"ASC",dispatch,params.page+1)
+            // alert(params.page + 1)
           }}
           
           // pageSizeOptions={[5, 10, 15, 20, 25]}
